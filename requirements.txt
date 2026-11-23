@@ -1,0 +1,7 @@
+# Project Dependencies for SaaS Integration Intelligence & Research Pipeline
+pydantic>=2.10.0
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+pandas>=2.2.0
+rich>=13.7.0
+urllib3>=2.0.0

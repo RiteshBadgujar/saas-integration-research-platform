@@ -1,0 +1,151 @@
+{
+  "evaluation_date": "2026-11-23",
+  "total_applications_researched": 100,
+  "total_manually_verified": 30,
+  "categories_evaluated": 10,
+  "samples_per_category": 3,
+  "verdict_accuracy_percentage": 86.7,
+  "correct_verdicts_count": 26,
+  "incorrect_verdicts_count": 4,
+  "field_level_accuracies": {
+    "authentication_type": 100.0,
+    "credential_access": 100.0,
+    "public_api": 100.0,
+    "webhooks": 100.0,
+    "mcp_support": 100.0,
+    "buildability": 86.7
+  },
+  "classification_metrics_by_class": {
+    "Buildable": {
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 4,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0
+    },
+    "Buildable with limitations": {
+      "true_positives": 24,
+      "false_positives": 4,
+      "false_negatives": 0,
+      "precision": 85.7,
+      "recall": 100.0,
+      "f1_score": 92.3
+    },
+    "Partner-dependent": {
+      "true_positives": 2,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "precision": 100.0,
+      "recall": 100.0,
+      "f1_score": 100.0
+    }
+  },
+  "confusion_matrix": {
+    "Buildable": {
+      "Buildable": 0,
+      "Buildable with limitations": 4,
+      "Partner-dependent": 0,
+      "Not currently buildable": 0,
+      "Insufficient evidence": 0
+    },
+    "Buildable with limitations": {
+      "Buildable": 0,
+      "Buildable with limitations": 24,
+      "Partner-dependent": 0,
+      "Not currently buildable": 0,
+      "Insufficient evidence": 0
+    },
+    "Partner-dependent": {
+      "Buildable": 0,
+      "Buildable with limitations": 0,
+      "Partner-dependent": 2,
+      "Not currently buildable": 0,
+      "Insufficient evidence": 0
+    },
+    "Not currently buildable": {
+      "Buildable": 0,
+      "Buildable with limitations": 0,
+      "Partner-dependent": 0,
+      "Not currently buildable": 0,
+      "Insufficient evidence": 0
+    },
+    "Insufficient evidence": {
+      "Buildable": 0,
+      "Buildable with limitations": 0,
+      "Partner-dependent": 0,
+      "Not currently buildable": 0,
+      "Insufficient evidence": 0
+    }
+  },
+  "corrections_made": [
+    {
+      "app_name": "Attio",
+      "category": "CRM and Sales",
+      "automated_verdict": "Buildable with limitations",
+      "verified_verdict": "Buildable",
+      "reason": "Corrected from 'Buildable with limitations' to 'Buildable'. Attio provides instant self-serve API keys in workspace settings with generous 50 req/s rate limits and zero blockers.",
+      "evidence_url": "https://docs.attio.com/reference/authentication"
+    },
+    {
+      "app_name": "Resend",
+      "category": "Marketing Automation",
+      "automated_verdict": "Buildable with limitations",
+      "verified_verdict": "Buildable",
+      "reason": "Corrected from 'Buildable with limitations' to 'Buildable'. Instant self-serve key generation, zero domain barriers for test sending, Svix-signed webhooks.",
+      "evidence_url": "https://resend.com/docs/api-reference/introduction"
+    },
+    {
+      "app_name": "Deel",
+      "category": "HR and Recruitment",
+      "automated_verdict": "Buildable with limitations",
+      "verified_verdict": "Buildable",
+      "reason": "Corrected from 'Buildable with limitations' to 'Buildable'. OAuth 2.0 and personal tokens generate instantaneously; self-serve developer sandbox with zero partner gates.",
+      "evidence_url": "https://developer.deel.com/docs/authentication"
+    },
+    {
+      "app_name": "Supabase",
+      "category": "Developer Tools",
+      "automated_verdict": "Buildable with limitations",
+      "verified_verdict": "Buildable",
+      "reason": "Corrected from 'Buildable with limitations' to 'Buildable'. Direct PostgREST queries with self-serve anon/service keys without external gatekeeping.",
+      "evidence_url": "https://supabase.com/docs/guides/api/api-keys"
+    }
+  ],
+  "error_patterns": [
+    {
+      "pattern": "Over-Conservative Limitation Classification (Heuristic Bleed)",
+      "frequency": 4,
+      "affected_applications": [
+        "Attio",
+        "Resend",
+        "Deel",
+        "Supabase"
+      ],
+      "root_cause": "The automated classifier's text parser flagged descriptive sentences starting with 'None; ...' as blocker strings, inappropriately downgrading 4 truly friction-free APIs from 'Buildable' to 'Buildable with limitations'.",
+      "impact": "Artificially deflates the proportion of turn-key buildable integrations.",
+      "operational_remedy": "Refine the blocker tokenization parser to strip leading 'None;' phrases before evaluating limitation strings."
+    },
+    {
+      "pattern": "Single-User Token vs Multi-Tenant App Credentials",
+      "frequency": 2,
+      "affected_applications": [
+        "Jira",
+        "Notion"
+      ],
+      "root_cause": "Platforms offering both internal integration tokens and public multi-tenant OAuth require distinguishing developer testing ease from end-user authorization complexity.",
+      "impact": "Underestimating integration effort for end-user SaaS distribution.",
+      "operational_remedy": "Separate 'Single-Workspace Feasibility' from 'Multi-Tenant Marketplace Feasibility' into distinct schema fields."
+    },
+    {
+      "pattern": "Silent Webhook Absence / Polling Dependency",
+      "frequency": 1,
+      "affected_applications": [
+        "Notion"
+      ],
+      "root_cause": "Assuming major modern platforms expose event webhooks by default when some key platforms (e.g. Notion, Expensify) require periodic polling.",
+      "impact": "Increased compute and API credit consumption for autonomous agent trigger workflows.",
+      "operational_remedy": "Classify all polling-dependent architectures as 'Buildable with limitations' to account for server polling infrastructure."
+    }
+  ]
+}

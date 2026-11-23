@@ -1,0 +1,1100 @@
+"""
+Script to build and validate the 100 SaaS applications seed catalog.
+Enforces 10 categories, exactly 10 apps per category (100 total), 0 duplicates,
+and exactly 3 manual verification samples per category (30 total).
+"""
+
+import json
+from pathlib import Path
+from research.schema import SaaSAppSeed, APPROVED_CATEGORIES
+
+RAW_SEEDS = [
+    # 1. CRM and Sales
+    {
+        "app_name": "HubSpot",
+        "category": "CRM and Sales",
+        "official_website": "https://www.hubspot.com",
+        "developer_docs": "https://developers.hubspot.com/docs/api/overview",
+        "is_manual_sample": True,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "hubspot",
+        "composio_comparison_notes": "Composio provides standard OAuth 2.0 app flow; covers CRM Contacts, Deals, Companies, and Engagements."
+    },
+    {
+        "app_name": "Salesforce",
+        "category": "CRM and Sales",
+        "official_website": "https://www.salesforce.com",
+        "developer_docs": "https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_rest.htm",
+        "is_manual_sample": True,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "salesforce",
+        "composio_comparison_notes": "Composio supports Connected App OAuth 2.0; supports SOQL queries, Lead/Contact CRUD, Opportunity pipeline."
+    },
+    {
+        "app_name": "Pipedrive",
+        "category": "CRM and Sales",
+        "official_website": "https://www.pipedrive.com",
+        "developer_docs": "https://developers.pipedrive.com/docs/api/v1",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "pipedrive",
+        "composio_comparison_notes": "Composio supports OAuth 2.0 and API token; provides actions for Deals, Persons, Activities, and Organizations."
+    },
+    {
+        "app_name": "Zoho CRM",
+        "category": "CRM and Sales",
+        "official_website": "https://www.zoho.com/crm",
+        "developer_docs": "https://www.zoho.com/crm/developer/docs/api/v6/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "zoho_crm",
+        "composio_comparison_notes": "Composio supports multi-datacenter OAuth 2.0 flow; covers standard CRM module records and search."
+    },
+    {
+        "app_name": "Close",
+        "category": "CRM and Sales",
+        "official_website": "https://www.close.com",
+        "developer_docs": "https://developer.close.com/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "close",
+        "composio_comparison_notes": "Composio uses Basic Auth (API key as username); covers Leads, Contacts, Opportunities, and Activities."
+    },
+    {
+        "app_name": "Copper",
+        "category": "CRM and Sales",
+        "official_website": "https://www.copper.com",
+        "developer_docs": "https://developer.copper.com/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Not yet in Composio catalog. Copper requires API key + user email headers; ideal candidate for API Key toolkit."
+    },
+    {
+        "app_name": "Attio",
+        "category": "CRM and Sales",
+        "official_website": "https://attio.com",
+        "developer_docs": "https://docs.attio.com",
+        "is_manual_sample": True,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "attio",
+        "composio_comparison_notes": "Composio supports Bearer API Tokens and OAuth 2.0; covers Records, Objects, Lists, and Notes."
+    },
+    {
+        "app_name": "Freshsales",
+        "category": "CRM and Sales",
+        "official_website": "https://www.freshworks.com/crm/sales/",
+        "developer_docs": "https://developer.freshsales.io/api/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Not natively packaged in Composio; requires account domain and per-agent API key."
+    },
+    {
+        "app_name": "Folk",
+        "category": "CRM and Sales",
+        "official_website": "https://folk.app",
+        "developer_docs": "https://developer.folk.app/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Modern lightweight CRM; API currently in beta with API key authentication."
+    },
+    {
+        "app_name": "ActiveCampaign",
+        "category": "CRM and Sales",
+        "official_website": "https://www.activecampaign.com",
+        "developer_docs": "https://developers.activecampaign.com/reference/overview",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "activecampaign",
+        "composio_comparison_notes": "Composio supports URL + API Token; covers Contacts, Deals, Accounts, and Tags."
+    },
+
+    # 2. Project Management
+    {
+        "app_name": "Jira",
+        "category": "Project Management",
+        "official_website": "https://www.atlassian.com/software/jira",
+        "developer_docs": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/intro/",
+        "is_manual_sample": True,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "jira",
+        "composio_comparison_notes": "Composio supports Atlassian 3LO OAuth 2.0 and API token; broad tool coverage (Issues, Projects, Transitions, JQL)."
+    },
+    {
+        "app_name": "Linear",
+        "category": "Project Management",
+        "official_website": "https://linear.app",
+        "developer_docs": "https://developers.linear.app/docs/graphql/working-with-the-graphql-api",
+        "is_manual_sample": True,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "linear",
+        "composio_comparison_notes": "Composio supports OAuth 2.0 and API keys; rich GraphQL mutation coverage for Issues, Projects, Comments, Cycles."
+    },
+    {
+        "app_name": "Asana",
+        "category": "Project Management",
+        "official_website": "https://asana.com",
+        "developer_docs": "https://developers.asana.com/docs/overview",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "asana",
+        "composio_comparison_notes": "Composio supports OAuth 2.0 and Personal Access Tokens; provides Tasks, Projects, Sections, Stories tools."
+    },
+    {
+        "app_name": "Monday.com",
+        "category": "Project Management",
+        "official_website": "https://monday.com",
+        "developer_docs": "https://developer.monday.com/api-reference/docs",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "monday",
+        "composio_comparison_notes": "Composio provides GraphQL API token integration for Boards, Items, Updates, and Groups."
+    },
+    {
+        "app_name": "ClickUp",
+        "category": "Project Management",
+        "official_website": "https://clickup.com",
+        "developer_docs": "https://clickup.com/api",
+        "is_manual_sample": True,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "clickup",
+        "composio_comparison_notes": "Composio supports OAuth 2.0 and Personal API Tokens; covers Tasks, Lists, Folders, Comments, Time Tracking."
+    },
+    {
+        "app_name": "Trello",
+        "category": "Project Management",
+        "official_website": "https://trello.com",
+        "developer_docs": "https://developer.atlassian.com/cloud/trello/rest/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "trello",
+        "composio_comparison_notes": "Composio uses API Key + User Token auth; covers Boards, Lists, Cards, Checklists."
+    },
+    {
+        "app_name": "Basecamp",
+        "category": "Project Management",
+        "official_website": "https://basecamp.com",
+        "developer_docs": "https://github.com/basecamp/bc3-api",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "basecamp",
+        "composio_comparison_notes": "Composio supports OAuth 2.0 Launchpad; covers To-dos, Messages, Campfires, Schedules."
+    },
+    {
+        "app_name": "Wrike",
+        "category": "Project Management",
+        "official_website": "https://www.wrike.com",
+        "developer_docs": "https://developers.wrike.com/overview/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Wrike supports OAuth 2.0 and permanent tokens; high-value enterprise project toolkit candidate."
+    },
+    {
+        "app_name": "Shortcut",
+        "category": "Project Management",
+        "official_website": "https://shortcut.com",
+        "developer_docs": "https://developer.shortcut.com/api/rest/v3",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "shortcut",
+        "composio_comparison_notes": "Composio supports API Token; covers Stories, Epics, Iterations, Milestones."
+    },
+    {
+        "app_name": "Plane",
+        "category": "Project Management",
+        "official_website": "https://plane.so",
+        "developer_docs": "https://developers.plane.so/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Open-source extensible project management; uses API Secret Keys for workspaces, projects, and issues."
+    },
+
+    # 3. Communication and Collaboration
+    {
+        "app_name": "Slack",
+        "category": "Communication and Collaboration",
+        "official_website": "https://slack.com",
+        "developer_docs": "https://api.slack.com/",
+        "is_manual_sample": True,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "slack",
+        "composio_comparison_notes": "Composio supports Bot and User OAuth 2.0 tokens; comprehensive toolkit covering Chat, Channels, Reactions, Files."
+    },
+    {
+        "app_name": "Discord",
+        "category": "Communication and Collaboration",
+        "official_website": "https://discord.com",
+        "developer_docs": "https://discord.com/developers/docs/intro",
+        "is_manual_sample": True,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "discord",
+        "composio_comparison_notes": "Composio supports Bot Tokens and OAuth 2.0; covers Channels, Messages, Guilds, Reactions."
+    },
+    {
+        "app_name": "Microsoft Teams",
+        "category": "Communication and Collaboration",
+        "official_website": "https://www.microsoft.com/microsoft-teams",
+        "developer_docs": "https://learn.microsoft.com/en-us/graph/api/resources/teams-api-overview",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "microsoft_teams",
+        "composio_comparison_notes": "Composio uses Microsoft Graph OAuth 2.0; covers Team Channels, Chat Messages, Meetings."
+    },
+    {
+        "app_name": "Zoom",
+        "category": "Communication and Collaboration",
+        "official_website": "https://zoom.us",
+        "developer_docs": "https://developers.zoom.us/docs/api/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "zoom",
+        "composio_comparison_notes": "Composio supports OAuth 2.0 and Server-to-Server OAuth; covers Meetings, Recordings, Users, Webinars."
+    },
+    {
+        "app_name": "Twilio",
+        "category": "Communication and Collaboration",
+        "official_website": "https://www.twilio.com",
+        "developer_docs": "https://www.twilio.com/docs/usage/api",
+        "is_manual_sample": True,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "twilio",
+        "composio_comparison_notes": "Composio supports Account SID + Auth Token Basic Auth; covers SMS, Voice calls, WhatsApp, Phone Numbers."
+    },
+    {
+        "app_name": "Front",
+        "category": "Communication and Collaboration",
+        "official_website": "https://front.com",
+        "developer_docs": "https://dev.frontapp.com/docs/getting-started",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "front",
+        "composio_comparison_notes": "Composio supports OAuth 2.0 and API Tokens; covers Inboxes, Conversations, Messages, Teammates."
+    },
+    {
+        "app_name": "Missive",
+        "category": "Communication and Collaboration",
+        "official_website": "https://missiveapp.com",
+        "developer_docs": "https://missiveapp.com/help/api/overview",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Collaborative email client; offers REST API with Bearer token authentication."
+    },
+    {
+        "app_name": "Miro",
+        "category": "Communication and Collaboration",
+        "official_website": "https://miro.com",
+        "developer_docs": "https://developers.miro.com/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "miro",
+        "composio_comparison_notes": "Composio supports OAuth 2.0 with refresh tokens; covers Boards, Items, Connectors, Widgets."
+    },
+    {
+        "app_name": "Mattermost",
+        "category": "Communication and Collaboration",
+        "official_website": "https://mattermost.com",
+        "developer_docs": "https://api.mattermost.com/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Open-source secure messaging; provides Bearer token & OAuth 2.0; excellent on-premise agent target."
+    },
+    {
+        "app_name": "Telegram",
+        "category": "Communication and Collaboration",
+        "official_website": "https://telegram.org",
+        "developer_docs": "https://core.telegram.org/bots/api",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "telegram",
+        "composio_comparison_notes": "Composio supports Telegram Bot Token auth; covers SendMessage, Updates, Webhooks, Media."
+    },
+
+    # 4. Marketing Automation
+    {
+        "app_name": "Mailchimp",
+        "category": "Marketing Automation",
+        "official_website": "https://mailchimp.com",
+        "developer_docs": "https://mailchimp.com/developer/marketing/api/",
+        "is_manual_sample": True,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "mailchimp",
+        "composio_comparison_notes": "Composio supports API Key and OAuth 2.0; covers Audiences/Lists, Campaigns, Members, Automations."
+    },
+    {
+        "app_name": "Klaviyo",
+        "category": "Marketing Automation",
+        "official_website": "https://www.klaviyo.com",
+        "developer_docs": "https://developers.klaviyo.com/en/reference/api_overview",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "klaviyo",
+        "composio_comparison_notes": "Composio supports Scoped API Key and OAuth 2.0; covers Profiles, Segments, Metrics, Campaigns."
+    },
+    {
+        "app_name": "SendGrid",
+        "category": "Marketing Automation",
+        "official_website": "https://sendgrid.com",
+        "developer_docs": "https://docs.sendgrid.com/api-reference",
+        "is_manual_sample": True,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "sendgrid",
+        "composio_comparison_notes": "Composio supports API Key Bearer auth; covers Mail Send, Marketing Contacts, Stats, Templates."
+    },
+    {
+        "app_name": "Brevo",
+        "category": "Marketing Automation",
+        "official_website": "https://www.brevo.com",
+        "developer_docs": "https://developers.brevo.com/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "brevo",
+        "composio_comparison_notes": "Composio supports API Key auth; covers Transactional Email, Contacts, SMS, Campaigns."
+    },
+    {
+        "app_name": "Kit",
+        "category": "Marketing Automation",
+        "official_website": "https://kit.com",
+        "developer_docs": "https://developers.kit.com/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Formerly ConvertKit; modern V4 API supports API Secret / OAuth; ideal creator economy target."
+    },
+    {
+        "app_name": "Customer.io",
+        "category": "Marketing Automation",
+        "official_website": "https://customer.io",
+        "developer_docs": "https://customer.io/docs/api/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Offers Track API (Site ID + API Key) and App API (Bearer Token) for event-driven journeys."
+    },
+    {
+        "app_name": "Braze",
+        "category": "Marketing Automation",
+        "official_website": "https://www.braze.com",
+        "developer_docs": "https://www.braze.com/docs/api/basics/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Enterprise customer engagement platform; requires REST API Key + instance URL."
+    },
+    {
+        "app_name": "Postmark",
+        "category": "Marketing Automation",
+        "official_website": "https://postmarkapp.com",
+        "developer_docs": "https://postmarkapp.com/developer",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "High deliverability email service; uses Server API Token header for transactional sending."
+    },
+    {
+        "app_name": "Iterable",
+        "category": "Marketing Automation",
+        "official_website": "https://iterable.com",
+        "developer_docs": "https://support.iterable.com/hc/en-us/articles/360043464871-API-Overview",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Enterprise cross-channel marketing; uses API key in headers."
+    },
+    {
+        "app_name": "Resend",
+        "category": "Marketing Automation",
+        "official_website": "https://resend.com",
+        "developer_docs": "https://resend.com/docs/api-reference/introduction",
+        "is_manual_sample": True,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "resend",
+        "composio_comparison_notes": "Composio supports Bearer API Key; covers Send Email, Batch Send, Domains, Audiences."
+    },
+
+    # 5. Customer Support
+    {
+        "app_name": "Zendesk",
+        "category": "Customer Support",
+        "official_website": "https://www.zendesk.com",
+        "developer_docs": "https://developer.zendesk.com/api-reference/",
+        "is_manual_sample": True,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "zendesk",
+        "composio_comparison_notes": "Composio supports OAuth 2.0 and API token auth; covers Tickets, Users, Organizations, Macros."
+    },
+    {
+        "app_name": "Intercom",
+        "category": "Customer Support",
+        "official_website": "https://www.intercom.com",
+        "developer_docs": "https://developers.intercom.com/docs",
+        "is_manual_sample": True,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "intercom",
+        "composio_comparison_notes": "Composio supports OAuth 2.0 and Access Tokens; covers Conversations, Contacts, Admins, Articles."
+    },
+    {
+        "app_name": "Freshdesk",
+        "category": "Customer Support",
+        "official_website": "https://freshdesk.com",
+        "developer_docs": "https://developers.freshdesk.com/api/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "freshdesk",
+        "composio_comparison_notes": "Composio supports API Key Basic Auth and domain; covers Tickets, Contacts, Agents, Solutions."
+    },
+    {
+        "app_name": "Help Scout",
+        "category": "Customer Support",
+        "official_website": "https://www.helpscout.com",
+        "developer_docs": "https://developer.helpscout.com/mailbox-api/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Mailbox API 2.0 uses OAuth 2.0 (Client Credentials and Auth Code); high priority support tool."
+    },
+    {
+        "app_name": "Gorgias",
+        "category": "Customer Support",
+        "official_website": "https://www.gorgias.com",
+        "developer_docs": "https://developers.gorgias.com/reference/introduction",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "gorgias",
+        "composio_comparison_notes": "Composio supports API Key and OAuth 2.0; covers Tickets, Customers, Messages for e-commerce."
+    },
+    {
+        "app_name": "Kustomer",
+        "category": "Customer Support",
+        "official_website": "https://www.kustomer.com",
+        "developer_docs": "https://developer.kustomer.com/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Modern CRM customer service platform; uses Scoped API Tokens."
+    },
+    {
+        "app_name": "Vitally",
+        "category": "Customer Support",
+        "official_website": "https://vitally.io",
+        "developer_docs": "https://docs.vitally.io/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Customer success platform with REST API using Basic Auth with API key."
+    },
+    {
+        "app_name": "Gainsight",
+        "category": "Customer Support",
+        "official_website": "https://www.gainsight.com",
+        "developer_docs": "https://support.gainsight.com/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Enterprise customer success; API gated behind NXT access keys and domain permissions."
+    },
+    {
+        "app_name": "Crisp",
+        "category": "Customer Support",
+        "official_website": "https://crisp.chat",
+        "developer_docs": "https://docs.crisp.chat/api/v1/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Crisp REST API uses Identifier / Key HTTP Basic Auth; full coverage of chats and profiles."
+    },
+    {
+        "app_name": "Plain",
+        "category": "Customer Support",
+        "official_website": "https://plain.com",
+        "developer_docs": "https://docs.plain.com/graphql-api",
+        "is_manual_sample": True,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Modern API-first support platform built for AI agents; GraphQL API with Bearer token authentication."
+    },
+
+    # 6. Finance and Accounting
+    {
+        "app_name": "Stripe",
+        "category": "Finance and Accounting",
+        "official_website": "https://stripe.com",
+        "developer_docs": "https://docs.stripe.com/api",
+        "is_manual_sample": True,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "stripe",
+        "composio_comparison_notes": "Composio supports Secret API Keys and Stripe Connect OAuth; comprehensive payments, customers, subscriptions."
+    },
+    {
+        "app_name": "QuickBooks Online",
+        "category": "Finance and Accounting",
+        "official_website": "https://quickbooks.intuit.com",
+        "developer_docs": "https://developer.intuit.com/app/developer/qbo/docs/api/accounting/most-popular/account",
+        "is_manual_sample": True,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "quickbooks",
+        "composio_comparison_notes": "Composio supports Intuit OAuth 2.0; covers Invoices, Customers, Accounts, Payments."
+    },
+    {
+        "app_name": "Xero",
+        "category": "Finance and Accounting",
+        "official_website": "https://www.xero.com",
+        "developer_docs": "https://developer.xero.com/documentation/api/accounting/overview",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "xero",
+        "composio_comparison_notes": "Composio supports Xero OAuth 2.0 PKCE flow; covers Invoices, Contacts, Bank Transactions."
+    },
+    {
+        "app_name": "Chargebee",
+        "category": "Finance and Accounting",
+        "official_website": "https://www.chargebee.com",
+        "developer_docs": "https://apidocs.chargebee.com/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Subscription billing; uses HTTP Basic Auth with API Key; self-serve sandboxes available."
+    },
+    {
+        "app_name": "Paddle",
+        "category": "Finance and Accounting",
+        "official_website": "https://www.paddle.com",
+        "developer_docs": "https://developer.paddle.com/api-reference/overview",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Paddle Billing API uses Bearer API tokens; clean REST API for digital goods."
+    },
+    {
+        "app_name": "Bill.com",
+        "category": "Finance and Accounting",
+        "official_website": "https://www.bill.com",
+        "developer_docs": "https://developer.bill.com/hc/en-us",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Accounts payable automation; uses Developer Key + Session Login token."
+    },
+    {
+        "app_name": "Expensify",
+        "category": "Finance and Accounting",
+        "official_website": "https://use.expensify.com",
+        "developer_docs": "https://integrations.expensify.com/Integration-Server/doc/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Uses partnerUserID + partnerUserSecret form-encoded API for expense report sync."
+    },
+    {
+        "app_name": "Brex",
+        "category": "Finance and Accounting",
+        "official_website": "https://www.brex.com",
+        "developer_docs": "https://developer.brex.com/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Corporate card & spend; provides OAuth 2.0 and User Tokens for Expenses and Payments."
+    },
+    {
+        "app_name": "Recurly",
+        "category": "Finance and Accounting",
+        "official_website": "https://recurly.com",
+        "developer_docs": "https://recurly.com/developers/api/v2021-02-25/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Subscription management; uses HTTP Basic Auth with API Key."
+    },
+    {
+        "app_name": "NetSuite",
+        "category": "Finance and Accounting",
+        "official_website": "https://www.netsuite.com",
+        "developer_docs": "https://docs.oracle.com/en/cloud/saas/netsuite/index.html",
+        "is_manual_sample": True,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Enterprise ERP; uses Token-Based Authentication (TBA / HMAC-SHA256) or OAuth 2.0 M2M; partner-heavy setup."
+    },
+
+    # 7. HR and Recruitment
+    {
+        "app_name": "Greenhouse",
+        "category": "HR and Recruitment",
+        "official_website": "https://www.greenhouse.com",
+        "developer_docs": "https://developers.greenhouse.io/harvest.html",
+        "is_manual_sample": True,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "greenhouse",
+        "composio_comparison_notes": "Composio supports Harvest API Key Basic Auth; covers Candidates, Applications, Jobs, Scorecards."
+    },
+    {
+        "app_name": "Lever",
+        "category": "HR and Recruitment",
+        "official_website": "https://www.lever.co",
+        "developer_docs": "https://hire.lever.co/developer/documentation",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Supports OAuth 2.0 and API Key; requires customer admin permissions to generate keys."
+    },
+    {
+        "app_name": "BambooHR",
+        "category": "HR and Recruitment",
+        "official_website": "https://www.bamboohr.com",
+        "developer_docs": "https://documentation.bamboohr.com/docs",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "bamboohr",
+        "composio_comparison_notes": "Composio supports API Key Basic Auth + subdomain; covers Employees, Time Off, Directory."
+    },
+    {
+        "app_name": "Workday",
+        "category": "HR and Recruitment",
+        "official_website": "https://www.workday.com",
+        "developer_docs": "https://developer.workday.com",
+        "is_manual_sample": True,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Enterprise HRIS; uses OAuth 2.0 Bearer tokens and SOAP/REST; requires customer tenant administrator setup."
+    },
+    {
+        "app_name": "Rippling",
+        "category": "HR and Recruitment",
+        "official_website": "https://www.rippling.com",
+        "developer_docs": "https://developer.rippling.com/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Rippling App Management API uses OAuth 2.0; apps must be submitted to the Rippling App Shop."
+    },
+    {
+        "app_name": "Deel",
+        "category": "HR and Recruitment",
+        "official_website": "https://remote.com", # Note: will fix to deel below
+        "developer_docs": "https://developer.deel.com/docs",
+        "is_manual_sample": True,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Global payroll & compliance; uses OAuth 2.0 and Personal Access Tokens; well-documented REST API."
+    },
+    {
+        "app_name": "Gusto",
+        "category": "HR and Recruitment",
+        "official_website": "https://gusto.com",
+        "developer_docs": "https://docs.gusto.com/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "gusto",
+        "composio_comparison_notes": "Composio supports OAuth 2.0; covers Employees, Payrolls, Companies, Benefits."
+    },
+    {
+        "app_name": "Ashby",
+        "category": "HR and Recruitment",
+        "official_website": "https://www.ashbyhq.com",
+        "developer_docs": "https://developers.ashbyhq.com/reference",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Fast-growing modern ATS; uses Basic Auth with API key; provides Candidates, Jobs, Interviews endpoints."
+    },
+    {
+        "app_name": "Personio",
+        "category": "HR and Recruitment",
+        "official_website": "https://www.personio.com",
+        "developer_docs": "https://developer.personio.de/reference",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Leading European HR platform; uses Client ID + Secret to exchange for Bearer tokens."
+    },
+    {
+        "app_name": "Remote",
+        "category": "HR and Recruitment",
+        "official_website": "https://remote.com",
+        "developer_docs": "https://developer.remote.com/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Global employment API; uses OAuth 2.0 and API keys; sandbox self-serve signup."
+    },
+
+    # 8. Developer Tools
+    {
+        "app_name": "GitHub",
+        "category": "Developer Tools",
+        "official_website": "https://github.com",
+        "developer_docs": "https://docs.github.com/en/rest",
+        "is_manual_sample": True,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "github",
+        "composio_comparison_notes": "Composio supports GitHub App OAuth 2.0 and fine-grained PAT; huge tool catalog (Repos, Pull Requests, Issues, Actions)."
+    },
+    {
+        "app_name": "GitLab",
+        "category": "Developer Tools",
+        "official_website": "https://gitlab.com",
+        "developer_docs": "https://docs.gitlab.com/ee/api/rest/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "gitlab",
+        "composio_comparison_notes": "Composio supports OAuth 2.0 and Personal Access Tokens; covers Projects, Merge Requests, Issues, Pipelines."
+    },
+    {
+        "app_name": "Supabase",
+        "category": "Developer Tools",
+        "official_website": "https://supabase.com",
+        "developer_docs": "https://supabase.com/docs/reference/api/introduction",
+        "is_manual_sample": True,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "supabase",
+        "composio_comparison_notes": "Composio supports Management API Token and Service Role Key; executes SQL queries and manages projects."
+    },
+    {
+        "app_name": "Postman",
+        "category": "Developer Tools",
+        "official_website": "https://www.postman.com",
+        "developer_docs": "https://learning.postman.com/docs/developer/postman-api/intro-api/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "postman",
+        "composio_comparison_notes": "Composio supports API Key (X-Api-Key); covers Collections, Workspaces, Environments, Mocks."
+    },
+    {
+        "app_name": "Vercel",
+        "category": "Developer Tools",
+        "official_website": "https://vercel.com",
+        "developer_docs": "https://vercel.com/docs/rest-api",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "vercel",
+        "composio_comparison_notes": "Composio supports Personal Tokens and OAuth 2.0; covers Deployments, Projects, Domains, Env Vars."
+    },
+    {
+        "app_name": "Sentry",
+        "category": "Developer Tools",
+        "official_website": "https://sentry.io",
+        "developer_docs": "https://docs.sentry.io/api/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "sentry",
+        "composio_comparison_notes": "Composio supports Auth Token Bearer and Internal Integrations; covers Issues, Projects, Events, Releases."
+    },
+    {
+        "app_name": "Datadog",
+        "category": "Developer Tools",
+        "official_website": "https://www.datadoghq.com",
+        "developer_docs": "https://docs.datadoghq.com/api/latest/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Uses API Key + Application Key; rich metrics, monitors, incidents, logs."
+    },
+    {
+        "app_name": "PagerDuty",
+        "category": "Developer Tools",
+        "official_website": "https://www.pagerduty.com",
+        "developer_docs": "https://developer.pagerduty.com/api-reference/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "pagerduty",
+        "composio_comparison_notes": "Composio supports REST API Keys and OAuth 2.0; covers Incidents, Services, On-calls, Schedules."
+    },
+    {
+        "app_name": "LaunchDarkly",
+        "category": "Developer Tools",
+        "official_website": "https://launchdarkly.com",
+        "developer_docs": "https://apidocs.launchdarkly.com/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Feature flag management; uses Personal or Service Tokens for feature flags and environments."
+    },
+    {
+        "app_name": "Cloudflare",
+        "category": "Developer Tools",
+        "official_website": "https://www.cloudflare.com",
+        "developer_docs": "https://developers.cloudflare.com/api/",
+        "is_manual_sample": True,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "cloudflare",
+        "composio_comparison_notes": "Composio supports Scoped API Tokens; covers DNS Records, Zones, Workers, Cache Purging."
+    },
+
+    # 9. Analytics and Business Intelligence
+    {
+        "app_name": "Mixpanel",
+        "category": "Analytics and Business Intelligence",
+        "official_website": "https://mixpanel.com",
+        "developer_docs": "https://developer.mixpanel.com/reference/overview",
+        "is_manual_sample": True,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "mixpanel",
+        "composio_comparison_notes": "Composio supports Service Account Secret / Project Token; covers Event Tracking, Cohorts, Insights."
+    },
+    {
+        "app_name": "Amplitude",
+        "category": "Analytics and Business Intelligence",
+        "official_website": "https://amplitude.com",
+        "developer_docs": "https://www.docs.developers.amplitude.com/analytics/apis/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "amplitude",
+        "composio_comparison_notes": "Composio supports API Key + Secret Key; covers Ingestion HTTP API, Cohorts, Behavioral Analysis."
+    },
+    {
+        "app_name": "Segment",
+        "category": "Analytics and Business Intelligence",
+        "official_website": "https://segment.com",
+        "developer_docs": "https://segment.com/docs/api/",
+        "is_manual_sample": True,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "segment",
+        "composio_comparison_notes": "Composio supports Write Keys (Tracking API) and Public API Bearer Tokens (Config API)."
+    },
+    {
+        "app_name": "Looker",
+        "category": "Analytics and Business Intelligence",
+        "official_website": "https://cloud.google.com/looker",
+        "developer_docs": "https://developers.looker.com/api/overview",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Google Cloud Looker API uses Client ID + Secret OAuth 2.0 exchange; runs queries, exports dashboards."
+    },
+    {
+        "app_name": "Tableau",
+        "category": "Analytics and Business Intelligence",
+        "official_website": "https://www.tableau.com",
+        "developer_docs": "https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api.htm",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Tableau Server/Cloud REST API uses Personal Access Tokens (PAT) or Connected Apps; workbook/datasource publishing."
+    },
+    {
+        "app_name": "Metabase",
+        "category": "Analytics and Business Intelligence",
+        "official_website": "https://www.metabase.com",
+        "developer_docs": "https://www.metabase.com/docs/latest/api-documentation",
+        "is_manual_sample": True,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Self-hosted & Cloud BI; uses Session Token or API Key; covers Card execution, Dashboards, Collections."
+    },
+    {
+        "app_name": "PostHog",
+        "category": "Analytics and Business Intelligence",
+        "official_website": "https://posthog.com",
+        "developer_docs": "https://posthog.com/docs/api",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "posthog",
+        "composio_comparison_notes": "Composio supports Personal API Key and Project API Key; covers Events, Feature Flags, Insights, Persons."
+    },
+    {
+        "app_name": "Heap",
+        "category": "Analytics and Business Intelligence",
+        "official_website": "https://heap.io",
+        "developer_docs": "https://developers.heap.io/reference/overview",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Product analytics platform; uses App ID and Server-Side Secret for event track and identify."
+    },
+    {
+        "app_name": "Fivetran",
+        "category": "Analytics and Business Intelligence",
+        "official_website": "https://fivetran.com",
+        "developer_docs": "https://fivetran.com/docs/rest-api",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Automated data movement; uses Basic Auth with API Key + Secret; controls connectors and syncs."
+    },
+    {
+        "app_name": "June.so",
+        "category": "Analytics and Business Intelligence",
+        "official_website": "https://www.june.so",
+        "developer_docs": "https://www.june.so/docs/api",
+        "is_manual_sample": False,
+        "composio_existing_support": "Not Supported",
+        "composio_toolkit_slug": None,
+        "composio_comparison_notes": "Opinionated B2B product analytics; uses write keys compatible with Segment track spec."
+    },
+
+    # 10. Storage and Document Management
+    {
+        "app_name": "Notion",
+        "category": "Storage and Document Management",
+        "official_website": "https://www.notion.so",
+        "developer_docs": "https://developers.notion.com/reference/intro",
+        "is_manual_sample": True,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "notion",
+        "composio_comparison_notes": "Composio supports OAuth 2.0 and Internal Integration Tokens; covers Pages, Databases, Blocks, Comments, Search."
+    },
+    {
+        "app_name": "Google Drive",
+        "category": "Storage and Document Management",
+        "official_website": "https://www.google.com/drive/",
+        "developer_docs": "https://developers.google.com/drive/api/guides/about-sdk",
+        "is_manual_sample": True,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "googledrive",
+        "composio_comparison_notes": "Composio supports Google OAuth 2.0 with refresh tokens; covers File Upload, Search, Sharing, Permissions."
+    },
+    {
+        "app_name": "Box",
+        "category": "Storage and Document Management",
+        "official_website": "https://www.box.com",
+        "developer_docs": "https://developer.box.com/reference/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "box",
+        "composio_comparison_notes": "Composio supports OAuth 2.0 and Server Authentication (JWT); covers Files, Folders, Collaborations, Metadata."
+    },
+    {
+        "app_name": "Dropbox",
+        "category": "Storage and Document Management",
+        "official_website": "https://www.dropbox.com",
+        "developer_docs": "https://www.dropbox.com/developers/documentation",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "dropbox",
+        "composio_comparison_notes": "Composio supports OAuth 2.0 with short-lived tokens and refresh tokens; covers Files, Sharing, Team folders."
+    },
+    {
+        "app_name": "Coda",
+        "category": "Storage and Document Management",
+        "official_website": "https://coda.io",
+        "developer_docs": "https://coda.io/developers/apis/v1",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "coda",
+        "composio_comparison_notes": "Composio supports API Bearer Tokens and OAuth 2.0; covers Docs, Pages, Tables, Rows, Formulas."
+    },
+    {
+        "app_name": "Confluence",
+        "category": "Storage and Document Management",
+        "official_website": "https://www.atlassian.com/software/confluence",
+        "developer_docs": "https://developer.atlassian.com/cloud/confluence/rest/v2/intro/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "confluence",
+        "composio_comparison_notes": "Composio supports Atlassian OAuth 2.0 (3LO); covers Pages, Spaces, Attachments, Comments."
+    },
+    {
+        "app_name": "Airtable",
+        "category": "Storage and Document Management",
+        "official_website": "https://airtable.com",
+        "developer_docs": "https://airtable.com/developers/web/api/introduction",
+        "is_manual_sample": True,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "airtable",
+        "composio_comparison_notes": "Composio supports Personal Access Tokens (PAT) and OAuth 2.0; covers Bases, Tables, Records, Comments."
+    },
+    {
+        "app_name": "DocuSign",
+        "category": "Storage and Document Management",
+        "official_website": "https://www.docusign.com",
+        "developer_docs": "https://developers.docusign.com/docs/esign-rest-api/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "docusign",
+        "composio_comparison_notes": "Composio supports eSignature OAuth 2.0 (JWT Grant / Auth Code); covers Envelopes, Templates, Recipients."
+    },
+    {
+        "app_name": "PandaDoc",
+        "category": "Storage and Document Management",
+        "official_website": "https://www.pandadoc.com",
+        "developer_docs": "https://developers.pandadoc.com/reference/about",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "pandadoc",
+        "composio_comparison_notes": "Composio supports API Key and OAuth 2.0; covers Documents, Templates, Recipients, Document Status."
+    },
+    {
+        "app_name": "Guru",
+        "category": "Storage and Document Management",
+        "official_website": "https://www.getguru.com",
+        "developer_docs": "https://developer.getguru.com/",
+        "is_manual_sample": False,
+        "composio_existing_support": "Official Toolkit",
+        "composio_toolkit_slug": "guru",
+        "composio_comparison_notes": "Composio supports Basic Auth with user email and API token; covers Cards, Boards, Collections, Folders."
+    }
+]
+
+# Quick fix for Deel website typo in definition
+for item in RAW_SEEDS:
+    if item["app_name"] == "Deel":
+        item["official_website"] = "https://www.deel.com"
+
+
+def build_and_validate():
+    print(f"Total raw seed items: {len(RAW_SEEDS)}")
+    
+    # 1. Uniqueness check by app_name
+    names = [s["app_name"].lower() for s in RAW_SEEDS]
+    if len(names) != len(set(names)):
+        duplicates = [name for name in names if names.count(name) > 1]
+        raise ValueError(f"Duplicate app names found: {set(duplicates)}")
+    print("✓ All 100 app names are strictly unique.")
+
+    # 2. Category distribution check (must be exactly 10 per category)
+    category_counts = {}
+    for s in RAW_SEEDS:
+        cat = s["category"]
+        category_counts[cat] = category_counts.get(cat, 0) + 1
+
+    for cat in APPROVED_CATEGORIES:
+        count = category_counts.get(cat, 0)
+        if count != 10:
+            raise ValueError(f"Category '{cat}' has {count} apps; expected exactly 10.")
+    print("✓ All 10 categories have exactly 10 applications (100 total).")
+
+    # 3. Manual sample distribution check (must be exactly 3 per category = 30 total)
+    sample_counts = {}
+    total_samples = 0
+    for s in RAW_SEEDS:
+        if s.get("is_manual_sample", False):
+            cat = s["category"]
+            sample_counts[cat] = sample_counts.get(cat, 0) + 1
+            total_samples += 1
+
+    if total_samples != 30:
+        raise ValueError(f"Total manual verification samples is {total_samples}; expected exactly 30.")
+
+    for cat in APPROVED_CATEGORIES:
+        count = sample_counts.get(cat, 0)
+        if count != 3:
+            raise ValueError(f"Category '{cat}' has {count} manual samples; expected exactly 3.")
+    print("✓ Manual verification samples: exactly 3 per category (30 total).")
+
+    # 4. Pydantic validation for every record
+    validated_seeds = []
+    for s in RAW_SEEDS:
+        obj = SaaSAppSeed(**s)
+        validated_seeds.append(obj.model_dump())
+    print("✓ All 100 records successfully passed Pydantic schema validation.")
+
+    # 5. Composio statistics
+    composio_official = sum(1 for s in RAW_SEEDS if s["composio_existing_support"] == "Official Toolkit")
+    composio_none = sum(1 for s in RAW_SEEDS if s["composio_existing_support"] == "Not Supported")
+    print(f"✓ Composio Parity Stats: {composio_official} Official Toolkits, {composio_none} Opportunities / Not Supported.")
+
+    # 6. Save to data/seed_apps.json
+    out_path = Path("data/seed_apps.json")
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(out_path, "w", encoding="utf-8") as f:
+        json.dump(validated_seeds, f, indent=2)
+    print(f"✓ Saved validated catalog to {out_path.resolve()}")
+
+
+if __name__ == "__main__":
+    build_and_validate()

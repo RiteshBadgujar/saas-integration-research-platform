@@ -1,0 +1,812 @@
+{
+  "Analytics and Business Intelligence": {
+    "total_apps": 10,
+    "buildability": {
+      "buildable": 0,
+      "buildable_with_limitations": 10,
+      "partner_dependent": 0,
+      "not_currently_buildable": 0,
+      "insufficient_evidence": 0,
+      "total_feasibly_buildable": 10,
+      "feasibly_buildable_pct": 100.0
+    },
+    "authentication_types": {
+      "Basic Auth": 3,
+      "Bearer JWT": 1,
+      "OAuth 2.0": 1,
+      "Personal Access Token (PAT)": 2,
+      "API Key": 3
+    },
+    "credential_access": {
+      "Self-serve": 9,
+      "Approval-required": 1
+    },
+    "composio_coverage": {
+      "official_toolkit": 4,
+      "not_supported_or_experimental": 6,
+      "official_toolkit_pct": 40.0,
+      "new_opportunity_pct": 60.0
+    },
+    "webhook_support": {
+      "supported": 10,
+      "not_supported": 0,
+      "support_pct": 100.0
+    },
+    "mcp_support": {
+      "official_mcp": 2,
+      "third_party_mcp": 5,
+      "not_found": 3,
+      "any_mcp_pct": 70.0
+    },
+    "notable_blockers": [
+      "Dual authentication model (Project Token for write events, Service Account Secret for reading query data).",
+      "Configuring destinations requires workspace owner or source admin permissions.",
+      "Requires manual vendor approval or app store review for distribution.; Requires Admin access on Looker instance to provision API3 keys; query latency depends on underlying warehouse execution.",
+      "Two-step authentication handshake (PAT must be exchanged for an ephemeral X-Tableau-Auth header token).",
+      "Long-running analytical queries can timeout if the underlying database warehouse is slow."
+    ],
+    "priority_new_integrations": [
+      {
+        "app_name": "Tableau",
+        "buildability": "Buildable with limitations",
+        "auth_type": "Personal Access Token (PAT)",
+        "api_coverage": "Broad",
+        "webhooks": "Supported",
+        "mcp_support": "Third-party MCP",
+        "composio_status": "Not Supported",
+        "priority_score": 9
+      },
+      {
+        "app_name": "Metabase",
+        "buildability": "Buildable with limitations",
+        "auth_type": "API Key",
+        "api_coverage": "Broad",
+        "webhooks": "Supported",
+        "mcp_support": "Third-party MCP",
+        "composio_status": "Not Supported",
+        "priority_score": 9
+      },
+      {
+        "app_name": "Heap",
+        "buildability": "Buildable with limitations",
+        "auth_type": "API Key",
+        "api_coverage": "Moderate",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 8
+      },
+      {
+        "app_name": "Fivetran",
+        "buildability": "Buildable with limitations",
+        "auth_type": "Basic Auth",
+        "api_coverage": "Broad",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 8
+      },
+      {
+        "app_name": "June.so",
+        "buildability": "Buildable with limitations",
+        "auth_type": "API Key",
+        "api_coverage": "Moderate",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 8
+      }
+    ]
+  },
+  "CRM and Sales": {
+    "total_apps": 10,
+    "buildability": {
+      "buildable": 1,
+      "buildable_with_limitations": 9,
+      "partner_dependent": 0,
+      "not_currently_buildable": 0,
+      "insufficient_evidence": 0,
+      "total_feasibly_buildable": 10,
+      "feasibly_buildable_pct": 100.0
+    },
+    "authentication_types": {
+      "OAuth 2.0": 4,
+      "API Key": 5,
+      "Bearer JWT": 1
+    },
+    "credential_access": {
+      "Self-serve": 10
+    },
+    "composio_coverage": {
+      "official_toolkit": 7,
+      "not_supported_or_experimental": 3,
+      "official_toolkit_pct": 70.0,
+      "new_opportunity_pct": 30.0
+    },
+    "webhook_support": {
+      "supported": 10,
+      "not_supported": 0,
+      "support_pct": 100.0
+    },
+    "mcp_support": {
+      "official_mcp": 0,
+      "third_party_mcp": 4,
+      "not_found": 6,
+      "any_mcp_pct": 40.0
+    },
+    "notable_blockers": [
+      "Requires Salesforce developer edition or enterprise admin rights to configure Connected Apps; daily 24-hour API call quotas.",
+      "Multi-region domain routing (accounts.zoho.com vs .eu vs .in) requires regional redirect routing; daily credit caps.",
+      "Requires account admin to generate user-specific API keys; tight 600 req/10 min rate limits.",
+      "Subdomain-specific API endpoints; per-hour account quota requires caching.",
+      "API is currently in v1 public beta; select advanced pipeline endpoints are still expanding."
+    ],
+    "priority_new_integrations": [
+      {
+        "app_name": "Copper",
+        "buildability": "Buildable with limitations",
+        "auth_type": "API Key",
+        "api_coverage": "Moderate",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 8
+      },
+      {
+        "app_name": "Freshsales",
+        "buildability": "Buildable with limitations",
+        "auth_type": "API Key",
+        "api_coverage": "Moderate",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 8
+      },
+      {
+        "app_name": "Folk",
+        "buildability": "Buildable with limitations",
+        "auth_type": "API Key",
+        "api_coverage": "Moderate",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 8
+      }
+    ]
+  },
+  "Communication and Collaboration": {
+    "total_apps": 10,
+    "buildability": {
+      "buildable": 0,
+      "buildable_with_limitations": 10,
+      "partner_dependent": 0,
+      "not_currently_buildable": 0,
+      "insufficient_evidence": 0,
+      "total_feasibly_buildable": 10,
+      "feasibly_buildable_pct": 100.0
+    },
+    "authentication_types": {
+      "OAuth 2.0": 7,
+      "Basic Auth": 1,
+      "API Key": 2
+    },
+    "credential_access": {
+      "Self-serve": 9,
+      "Approval-required": 1
+    },
+    "composio_coverage": {
+      "official_toolkit": 8,
+      "not_supported_or_experimental": 2,
+      "official_toolkit_pct": 80.0,
+      "new_opportunity_pct": 20.0
+    },
+    "webhook_support": {
+      "supported": 10,
+      "not_supported": 0,
+      "support_pct": 100.0
+    },
+    "mcp_support": {
+      "official_mcp": 1,
+      "third_party_mcp": 5,
+      "not_found": 4,
+      "any_mcp_pct": 60.0
+    },
+    "notable_blockers": [
+      "Restricted rate limits (Tiered rate limits per method (Tier 1: 1 req/min, Tier 2: 20 req/min, Tier 3: 50 req/min, Tier 4: 100+ req/min per workspace).) restrict rapid agent execution.; Workspace admin app installation approval required in enterprise Slack organizations; rate limits on rapid message posting.",
+      "Bots in over 100 guilds require Discord Bot Verification (ID/business verification); privileged gateway intents require explicit toggles.",
+      "Requires manual vendor approval or app store review for distribution.; Requires Azure AD App registration and Microsoft 365 Tenant Admin Consent for organization-wide permissions.",
+      "Restricted rate limits (Tiered rate limits: Light (30 req/sec), Medium (20 req/sec), Heavy (10 req/sec), Resource-intensive (2 req/sec).) restrict rapid agent execution.; Server-to-Server OAuth apps require Zoom Account Admin permissions to generate client credentials.",
+      "Carrier compliance regulations (A2P 10DLC brand & campaign registration required for sending SMS to US numbers)."
+    ],
+    "priority_new_integrations": [
+      {
+        "app_name": "Missive",
+        "buildability": "Buildable with limitations",
+        "auth_type": "API Key",
+        "api_coverage": "Moderate",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 8
+      },
+      {
+        "app_name": "Mattermost",
+        "buildability": "Buildable with limitations",
+        "auth_type": "OAuth 2.0",
+        "api_coverage": "Broad",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 8
+      }
+    ]
+  },
+  "Customer Support": {
+    "total_apps": 10,
+    "buildability": {
+      "buildable": 0,
+      "buildable_with_limitations": 10,
+      "partner_dependent": 0,
+      "not_currently_buildable": 0,
+      "insufficient_evidence": 0,
+      "total_feasibly_buildable": 10,
+      "feasibly_buildable_pct": 100.0
+    },
+    "authentication_types": {
+      "OAuth 2.0": 3,
+      "API Key": 3,
+      "Basic Auth": 3,
+      "Bearer JWT": 1
+    },
+    "credential_access": {
+      "Self-serve": 9,
+      "Approval-required": 1
+    },
+    "composio_coverage": {
+      "official_toolkit": 4,
+      "not_supported_or_experimental": 6,
+      "official_toolkit_pct": 40.0,
+      "new_opportunity_pct": 60.0
+    },
+    "webhook_support": {
+      "supported": 10,
+      "not_supported": 0,
+      "support_pct": 100.0
+    },
+    "mcp_support": {
+      "official_mcp": 0,
+      "third_party_mcp": 3,
+      "not_found": 7,
+      "any_mcp_pct": 30.0
+    },
+    "notable_blockers": [
+      "Subdomain routing required (https://{subdomain}.zendesk.com); API token requires admin activation in Admin Center.",
+      "Must pass explicit 'Intercom-Version' header (e.g. 2.11) on all HTTP calls.",
+      "Subdomain URL prefix (https://domain.freshdesk.com) required for API routing.",
+      "Mailbox API 2.0 uses ephemeral access tokens (expires in 2 hours) requiring automated refresh token handling.",
+      "Restricted rate limits (Leaky bucket algorithm: 2 requests per second with burst capacity up to 20 requests.) restrict rapid agent execution.; Strict 2 req/s leaky bucket limit requires client-side rate-limiting queues."
+    ],
+    "priority_new_integrations": [
+      {
+        "app_name": "Plain",
+        "buildability": "Buildable with limitations",
+        "auth_type": "Bearer JWT",
+        "api_coverage": "Broad",
+        "webhooks": "Supported",
+        "mcp_support": "Third-party MCP",
+        "composio_status": "Not Supported",
+        "priority_score": 9
+      },
+      {
+        "app_name": "Help Scout",
+        "buildability": "Buildable with limitations",
+        "auth_type": "OAuth 2.0",
+        "api_coverage": "Broad",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 8
+      },
+      {
+        "app_name": "Kustomer",
+        "buildability": "Buildable with limitations",
+        "auth_type": "API Key",
+        "api_coverage": "Broad",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 8
+      },
+      {
+        "app_name": "Vitally",
+        "buildability": "Buildable with limitations",
+        "auth_type": "Basic Auth",
+        "api_coverage": "Moderate",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 8
+      },
+      {
+        "app_name": "Crisp",
+        "buildability": "Buildable with limitations",
+        "auth_type": "Basic Auth",
+        "api_coverage": "Broad",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 8
+      }
+    ]
+  },
+  "Developer Tools": {
+    "total_apps": 10,
+    "buildability": {
+      "buildable": 1,
+      "buildable_with_limitations": 9,
+      "partner_dependent": 0,
+      "not_currently_buildable": 0,
+      "insufficient_evidence": 0,
+      "total_feasibly_buildable": 10,
+      "feasibly_buildable_pct": 100.0
+    },
+    "authentication_types": {
+      "OAuth 2.0": 1,
+      "Personal Access Token (PAT)": 1,
+      "API Key": 6,
+      "Bearer JWT": 2
+    },
+    "credential_access": {
+      "Self-serve": 10
+    },
+    "composio_coverage": {
+      "official_toolkit": 8,
+      "not_supported_or_experimental": 2,
+      "official_toolkit_pct": 80.0,
+      "new_opportunity_pct": 20.0
+    },
+    "webhook_support": {
+      "supported": 10,
+      "not_supported": 0,
+      "support_pct": 100.0
+    },
+    "mcp_support": {
+      "official_mcp": 6,
+      "third_party_mcp": 3,
+      "not_found": 1,
+      "any_mcp_pct": 90.0
+    },
+    "notable_blockers": [
+      "Branch protection rules, mandatory code review requirements, and fine-grained repository permission scopes.",
+      "Requires configuring appropriate token scopes (api, read_api, read_repository, write_repository).",
+      "Team-scoped operations require passing 'teamId' query parameter on all API calls.",
+      "Organization and project slugs required in endpoint URLs (e.g. /api/0/projects/{org_slug}/{project_slug}/).",
+      "Requires both API Key and Application Key simultaneously for read/write API access; regional datacenter URLs (us1, us5, eu1)."
+    ],
+    "priority_new_integrations": [
+      {
+        "app_name": "Datadog",
+        "buildability": "Buildable with limitations",
+        "auth_type": "API Key",
+        "api_coverage": "Broad",
+        "webhooks": "Supported",
+        "mcp_support": "Third-party MCP",
+        "composio_status": "Not Supported",
+        "priority_score": 9
+      },
+      {
+        "app_name": "LaunchDarkly",
+        "buildability": "Buildable with limitations",
+        "auth_type": "API Key",
+        "api_coverage": "Broad",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 8
+      }
+    ]
+  },
+  "Finance and Accounting": {
+    "total_apps": 10,
+    "buildability": {
+      "buildable": 0,
+      "buildable_with_limitations": 9,
+      "partner_dependent": 1,
+      "not_currently_buildable": 0,
+      "insufficient_evidence": 0,
+      "total_feasibly_buildable": 9,
+      "feasibly_buildable_pct": 90.0
+    },
+    "authentication_types": {
+      "API Key": 4,
+      "OAuth 2.0": 4,
+      "Basic Auth": 2
+    },
+    "credential_access": {
+      "Self-serve": 8,
+      "Approval-required": 1,
+      "Partner-gated": 1
+    },
+    "composio_coverage": {
+      "official_toolkit": 3,
+      "not_supported_or_experimental": 7,
+      "official_toolkit_pct": 30.0,
+      "new_opportunity_pct": 70.0
+    },
+    "webhook_support": {
+      "supported": 9,
+      "not_supported": 1,
+      "support_pct": 90.0
+    },
+    "mcp_support": {
+      "official_mcp": 1,
+      "third_party_mcp": 3,
+      "not_found": 6,
+      "any_mcp_pct": 40.0
+    },
+    "notable_blockers": [
+      "PCI compliance requirements for raw credit card data handling (use Stripe Elements / Tokens); Idempotency-Key recommended for all POST mutations.",
+      "OAuth access tokens expire in 60 minutes; refresh tokens expire in 101 days; requires capturing realmId during authorization handshake.",
+      "Short token lifespan (access token valid for 30 minutes); requires xero-tenant-id routing header on every API call.",
+      "Site-specific subdomain prefix (https://{site}.chargebee.com/api/v2) required for all API calls.",
+      "Paddle acts as Merchant of Record, meaning checkout configuration and tax collection rules differ from standard payment gateways."
+    ],
+    "priority_new_integrations": [
+      {
+        "app_name": "Brex",
+        "buildability": "Buildable with limitations",
+        "auth_type": "OAuth 2.0",
+        "api_coverage": "Broad",
+        "webhooks": "Supported",
+        "mcp_support": "Third-party MCP",
+        "composio_status": "Not Supported",
+        "priority_score": 9
+      },
+      {
+        "app_name": "Chargebee",
+        "buildability": "Buildable with limitations",
+        "auth_type": "Basic Auth",
+        "api_coverage": "Broad",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 8
+      },
+      {
+        "app_name": "Paddle",
+        "buildability": "Buildable with limitations",
+        "auth_type": "API Key",
+        "api_coverage": "Broad",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 8
+      },
+      {
+        "app_name": "Recurly",
+        "buildability": "Buildable with limitations",
+        "auth_type": "Basic Auth",
+        "api_coverage": "Broad",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 8
+      },
+      {
+        "app_name": "Bill.com",
+        "buildability": "Buildable with limitations",
+        "auth_type": "API Key",
+        "api_coverage": "Moderate",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 6
+      }
+    ]
+  },
+  "HR and Recruitment": {
+    "total_apps": 10,
+    "buildability": {
+      "buildable": 1,
+      "buildable_with_limitations": 8,
+      "partner_dependent": 1,
+      "not_currently_buildable": 0,
+      "insufficient_evidence": 0,
+      "total_feasibly_buildable": 9,
+      "feasibly_buildable_pct": 90.0
+    },
+    "authentication_types": {
+      "Basic Auth": 3,
+      "OAuth 2.0": 7
+    },
+    "credential_access": {
+      "Self-serve": 7,
+      "Approval-required": 2,
+      "Partner-gated": 1
+    },
+    "composio_coverage": {
+      "official_toolkit": 3,
+      "not_supported_or_experimental": 7,
+      "official_toolkit_pct": 30.0,
+      "new_opportunity_pct": 70.0
+    },
+    "webhook_support": {
+      "supported": 10,
+      "not_supported": 0,
+      "support_pct": 100.0
+    },
+    "mcp_support": {
+      "official_mcp": 0,
+      "third_party_mcp": 4,
+      "not_found": 6,
+      "any_mcp_pct": 40.0
+    },
+    "notable_blockers": [
+      "Harvest API key creation requires Greenhouse Site Admin permissions.",
+      "Requires manual vendor approval or app store review for distribution.; Super Admin access required to generate API keys in Lever Settings > Integrations.",
+      "Subdomain URL prefix (https://api.bamboohr.com/api/gateway.php/{companyDomain}/v1) required for all API calls.",
+      "Requires enterprise Workday contract, Integration System User (ISU) creation, and Tenant Security Administrator configuration.",
+      "Requires manual vendor approval or app store review for distribution.; App Shop distribution requires formal developer review and partner onboarding."
+    ],
+    "priority_new_integrations": [
+      {
+        "app_name": "Deel",
+        "buildability": "Buildable",
+        "auth_type": "OAuth 2.0",
+        "api_coverage": "Broad",
+        "webhooks": "Supported",
+        "mcp_support": "Third-party MCP",
+        "composio_status": "Not Supported",
+        "priority_score": 9
+      },
+      {
+        "app_name": "Ashby",
+        "buildability": "Buildable with limitations",
+        "auth_type": "Basic Auth",
+        "api_coverage": "Broad",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 8
+      },
+      {
+        "app_name": "Personio",
+        "buildability": "Buildable with limitations",
+        "auth_type": "OAuth 2.0",
+        "api_coverage": "Moderate",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 8
+      },
+      {
+        "app_name": "Remote",
+        "buildability": "Buildable with limitations",
+        "auth_type": "OAuth 2.0",
+        "api_coverage": "Broad",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 8
+      },
+      {
+        "app_name": "Lever",
+        "buildability": "Buildable with limitations",
+        "auth_type": "OAuth 2.0",
+        "api_coverage": "Broad",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 6
+      }
+    ]
+  },
+  "Marketing Automation": {
+    "total_apps": 10,
+    "buildability": {
+      "buildable": 1,
+      "buildable_with_limitations": 9,
+      "partner_dependent": 0,
+      "not_currently_buildable": 0,
+      "insufficient_evidence": 0,
+      "total_feasibly_buildable": 10,
+      "feasibly_buildable_pct": 100.0
+    },
+    "authentication_types": {
+      "OAuth 2.0": 1,
+      "API Key": 9
+    },
+    "credential_access": {
+      "Self-serve": 8,
+      "Approval-required": 2
+    },
+    "composio_coverage": {
+      "official_toolkit": 5,
+      "not_supported_or_experimental": 5,
+      "official_toolkit_pct": 50.0,
+      "new_opportunity_pct": 50.0
+    },
+    "webhook_support": {
+      "supported": 10,
+      "not_supported": 0,
+      "support_pct": 100.0
+    },
+    "mcp_support": {
+      "official_mcp": 0,
+      "third_party_mcp": 4,
+      "not_found": 6,
+      "any_mcp_pct": 40.0
+    },
+    "notable_blockers": [
+      "API key requires dynamic datacenter URL prefix extraction (e.g. https://<dc>.api.mailchimp.com/3.0/).",
+      "Requires passing explicit 'revision' date header on every API request.",
+      "Sender identity domain verification (SPF/DKIM DNS records) required before sending live emails.",
+      "Account activation requires completing business profile verification for transactional sending.",
+      "Dual authentication architecture (Track API vs App API require distinct credentials and base URLs)."
+    ],
+    "priority_new_integrations": [
+      {
+        "app_name": "Kit",
+        "buildability": "Buildable with limitations",
+        "auth_type": "API Key",
+        "api_coverage": "Broad",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 8
+      },
+      {
+        "app_name": "Customer.io",
+        "buildability": "Buildable with limitations",
+        "auth_type": "API Key",
+        "api_coverage": "Broad",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 8
+      },
+      {
+        "app_name": "Postmark",
+        "buildability": "Buildable with limitations",
+        "auth_type": "API Key",
+        "api_coverage": "Broad",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 8
+      },
+      {
+        "app_name": "Braze",
+        "buildability": "Buildable with limitations",
+        "auth_type": "API Key",
+        "api_coverage": "Broad",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 6
+      },
+      {
+        "app_name": "Iterable",
+        "buildability": "Buildable with limitations",
+        "auth_type": "API Key",
+        "api_coverage": "Broad",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 6
+      }
+    ]
+  },
+  "Project Management": {
+    "total_apps": 10,
+    "buildability": {
+      "buildable": 0,
+      "buildable_with_limitations": 10,
+      "partner_dependent": 0,
+      "not_currently_buildable": 0,
+      "insufficient_evidence": 0,
+      "total_feasibly_buildable": 10,
+      "feasibly_buildable_pct": 100.0
+    },
+    "authentication_types": {
+      "OAuth 2.0": 7,
+      "API Key": 3
+    },
+    "credential_access": {
+      "Self-serve": 10
+    },
+    "composio_coverage": {
+      "official_toolkit": 8,
+      "not_supported_or_experimental": 2,
+      "official_toolkit_pct": 80.0,
+      "new_opportunity_pct": 20.0
+    },
+    "webhook_support": {
+      "supported": 10,
+      "not_supported": 0,
+      "support_pct": 100.0
+    },
+    "mcp_support": {
+      "official_mcp": 2,
+      "third_party_mcp": 6,
+      "not_found": 2,
+      "any_mcp_pct": 80.0
+    },
+    "notable_blockers": [
+      "Complex Atlassian Cloud site routing (cloudId resolution required before invoking REST endpoints); OAuth 3LO scope granularity.",
+      "GraphQL-only API requires client-side GraphQL query construction rather than standard REST endpoints.",
+      "Webhook handshake requires handling X-Hook-Secret challenge header on setup.",
+      "GraphQL-only API; webhooks require returning challenge JSON payload during setup.",
+      "Hierarchical data model (Team > Space > Folder > List > Task) requires resolving ancestor container IDs."
+    ],
+    "priority_new_integrations": [
+      {
+        "app_name": "Plane",
+        "buildability": "Buildable with limitations",
+        "auth_type": "API Key",
+        "api_coverage": "Broad",
+        "webhooks": "Supported",
+        "mcp_support": "Third-party MCP",
+        "composio_status": "Not Supported",
+        "priority_score": 9
+      },
+      {
+        "app_name": "Wrike",
+        "buildability": "Buildable with limitations",
+        "auth_type": "OAuth 2.0",
+        "api_coverage": "Broad",
+        "webhooks": "Supported",
+        "mcp_support": "Not Found in Checked Sources",
+        "composio_status": "Not Supported",
+        "priority_score": 8
+      }
+    ]
+  },
+  "Storage and Document Management": {
+    "total_apps": 10,
+    "buildability": {
+      "buildable": 0,
+      "buildable_with_limitations": 10,
+      "partner_dependent": 0,
+      "not_currently_buildable": 0,
+      "insufficient_evidence": 0,
+      "total_feasibly_buildable": 10,
+      "feasibly_buildable_pct": 100.0
+    },
+    "authentication_types": {
+      "Bearer JWT": 2,
+      "OAuth 2.0": 5,
+      "Personal Access Token (PAT)": 1,
+      "API Key": 1,
+      "Basic Auth": 1
+    },
+    "credential_access": {
+      "Self-serve": 10
+    },
+    "composio_coverage": {
+      "official_toolkit": 10,
+      "not_supported_or_experimental": 0,
+      "official_toolkit_pct": 100.0,
+      "new_opportunity_pct": 0.0
+    },
+    "webhook_support": {
+      "supported": 9,
+      "not_supported": 1,
+      "support_pct": 90.0
+    },
+    "mcp_support": {
+      "official_mcp": 3,
+      "third_party_mcp": 4,
+      "not_found": 3,
+      "any_mcp_pct": 70.0
+    },
+    "notable_blockers": [
+      "Lacks native webhooks; requires polling for event-driven workflows.; Must explicitly share pages and databases with the Integration in Notion UI; lacks native real-time webhooks (polling required).",
+      "Public multi-tenant apps requesting sensitive scopes (e.g. drive.readonly, drive.file) require Google Cloud App Verification and OAuth Consent Screen review.",
+      "Enterprise Server Authentication (JWT) requires Box Enterprise Administrator authorization in the Admin Console.",
+      "Webhook verification requires responding to initial GET challenge request containing 'challenge' parameter.",
+      "Requires resolving Atlassian cloudId from accessible resources endpoint before invoking REST endpoints; storage format is XHTML/ADF."
+    ],
+    "priority_new_integrations": []
+  }
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "name": "CRM and Sales",
+    "description": "Customer relationship management, lead generation, sales pipeline tracking, and contact management systems.",
+    "agent_relevance": "High. Agents automate lead enrichment, deal updates, customer meeting logging, and outreach sequencing.",
+    "typical_auth": "OAuth 2.0 (Authorization Code Flow) for multi-tenant integrations; API Keys for single-workspace custom apps.",
+    "common_blockers": "Custom field schema discovery, strict API call limits per seat, and enterprise permissions."
+  },
+  {
+    "id": 2,
+    "name": "Project Management",
+    "description": "Task management, issue tracking, sprint planning, and roadmap visualization platforms.",
+    "agent_relevance": "Critical. Agents manage backlog grooming, create subtasks, assign tickets, and report project status.",
+    "typical_auth": "OAuth 2.0 and Personal Access Tokens (PAT); workspace-scoped granular tokens.",
+    "common_blockers": "Complex multi-tenant workspace routing, webhooks verification, and custom status workflows."
+  },
+  {
+    "id": 3,
+    "name": "Communication and Collaboration",
+    "description": "Real-time messaging, telephony, video conferencing, and team collaboration platforms.",
+    "agent_relevance": "Critical. Serves as the primary conversational interface (chatbots) and alert dispatch channel for autonomous agents.",
+    "typical_auth": "OAuth 2.0 Bot Tokens, Bearer Tokens, and API Key / Account SID pairs.",
+    "common_blockers": "Socket Mode vs HTTP webhook URL verification, bot permission scopes, rate limits on message broadcasting."
+  },
+  {
+    "id": 4,
+    "name": "Marketing Automation",
+    "description": "Email campaigns, customer lifecycle messaging, audience segmentation, and deliverability platforms.",
+    "agent_relevance": "High. Agents draft emails, trigger subscriber journeys, analyze engagement metrics, and tag contacts.",
+    "typical_auth": "API Keys and OAuth 2.0; domain verification DNS records for sending tools.",
+    "common_blockers": "Compliance/anti-spam gating, list double-opt-in rules, bulk payload rate caps."
+  },
+  {
+    "id": 5,
+    "name": "Customer Support",
+    "description": "Help desks, ticketing systems, conversational support widgets, and knowledge base portals.",
+    "agent_relevance": "Critical. Direct operational domain for autonomous triage, automated replies, sentiment analysis, and escalation.",
+    "typical_auth": "OAuth 2.0 and Basic Auth (Token/email), Scoped API Keys.",
+    "common_blockers": "Agent seat license attribution (making API calls on behalf of an agent vs a human seat)."
+  },
+  {
+    "id": 6,
+    "name": "Finance and Accounting",
+    "description": "Payment gateways, general ledger accounting, invoicing, subscription billing, and expense management.",
+    "agent_relevance": "High value, high risk. Agents automate reconciliation, invoice creation, and payment collection tracking.",
+    "typical_auth": "Restricted Secret API Keys with IP whitelisting; OAuth 2.0 for multi-tenant accounting platforms.",
+    "common_blockers": "Strict compliance (PCI-DSS/SOX), partner program hurdles for accounting software (e.g. QuickBooks/NetSuite), sandbox requirements."
+  },
+  {
+    "id": 7,
+    "name": "HR and Recruitment",
+    "description": "Applicant tracking systems (ATS), human resource information systems (HRIS), and global payroll platforms.",
+    "agent_relevance": "High. Agents parse candidate profiles, coordinate interview scheduling, and update employee onboarding.",
+    "typical_auth": "API Keys, OAuth 2.0, and Enterprise Client Credentials; often partner-gated.",
+    "common_blockers": "Enterprise tier lock-in, vendor marketplace certification hurdles, strict PII privacy constraints."
+  },
+  {
+    "id": 8,
+    "name": "Developer Tools",
+    "description": "Source code management, CI/CD, cloud infrastructure, error monitoring, and feature flag management.",
+    "agent_relevance": "Core ecosystem. Developer agents open PRs, monitor logs, deploy builds, and triage errors.",
+    "typical_auth": "Fine-grained Personal Access Tokens, GitHub Apps (private key + installation token), Scoped API Tokens.",
+    "common_blockers": "Branch protection rules, organization-level SSO enforcement, and short token lifespans."
+  },
+  {
+    "id": 9,
+    "name": "Analytics and Business Intelligence",
+    "description": "Product analytics, customer data platforms (CDP), SQL dashboards, and event streaming pipelines.",
+    "agent_relevance": "Medium-High. Agents run ad-hoc queries, extract business KPIs, and synchronize tracking events.",
+    "typical_auth": "Project Write Keys for ingestion, OAuth 2.0 or Service Account Keys for querying data.",
+    "common_blockers": "Query compute costs, asynchronous export jobs for large query results, rate limits on bulk export."
+  },
+  {
+    "id": 10,
+    "name": "Storage and Document Management",
+    "description": "Cloud object/file storage, collaborative documents, electronic signatures, and relational databases.",
+    "agent_relevance": "Critical. Agents read reference documentation, generate reports, store artifacts, and request signatures.",
+    "typical_auth": "OAuth 2.0 with refresh tokens, Internal Integration Tokens (Notion/Coda), Service Accounts.",
+    "common_blockers": "File size limits for uploads/downloads, block-level nested document structures, permission inheritance."
+  }
+]
